@@ -29,24 +29,16 @@ class MRepConv(nn.Module):
                 nn.BatchNorm2d(c2),
             )
 
-            
             self.branch_1x1 = nn.Sequential(
                 nn.Conv2d(c1, c2, kernel_size=1, stride=stride, padding=0, bias=False),
                 nn.BatchNorm2d(c2),
             )
 
-            
-            self.branch_id = (
-                nn.BatchNorm2d(c1) if (stride == 1 and c1 == c2) else None
-            )
+            self.branch_id = nn.BatchNorm2d(c1) if (stride == 1 and c1 == c2) else None
             if use_alpha:
                 self.alpha_3x3 = nn.Parameter(torch.tensor(1.0))
                 self.alpha_1x1 = nn.Parameter(torch.tensor(1.0))
-                self.alpha_id = (
-                    nn.Parameter(torch.tensor(1.0))
-                    if self.branch_id is not None
-                    else None
-                )
+                self.alpha_id = nn.Parameter(torch.tensor(1.0)) if self.branch_id is not None else None
             else:
                 self.register_parameter("alpha_3x3", None)
                 self.register_parameter("alpha_1x1", None)
@@ -54,11 +46,9 @@ class MRepConv(nn.Module):
 
             self._init_weights()
 
-    
-
     def _init_weights(self):
         n_branches = 2 + (1 if self.branch_id is not None else 0)
-        scale = 1.0 / (n_branches ** 0.5)
+        scale = 1.0 / (n_branches**0.5)
 
         for branch in [self.branch_3x3, self.branch_1x1]:
             conv, bn = branch[0], branch[1]
@@ -70,8 +60,6 @@ class MRepConv(nn.Module):
         if self.branch_id is not None:
             nn.init.ones_(self.branch_id.weight)
             nn.init.zeros_(self.branch_id.bias)
-
-    
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.deploy:
@@ -91,8 +79,6 @@ class MRepConv(nn.Module):
                 out = out + self.branch_id(x)
 
         return self.act(out)
-
-   
 
     @torch.no_grad()
     def switch_to_deploy(self):
@@ -144,7 +130,6 @@ class MRepConv(nn.Module):
 
         return k3 + k1 + kid, b3 + b1 + bid
 
-
     @staticmethod
     def _fuse_conv_bn(branch: nn.Sequential):
         conv, bn = branch[0], branch[1]
@@ -160,7 +145,7 @@ class MRepConv(nn.Module):
         for i in range(c):
             kernel[i, i, 1, 1] = 1.0
         std = torch.sqrt(bn.running_var + bn.eps)
-        t = (bn.weight / std)
+        t = bn.weight / std
         kernel = kernel * t.reshape(-1, 1, 1, 1)
         bias = bn.bias - bn.running_mean * bn.weight / std
         return kernel, bias
