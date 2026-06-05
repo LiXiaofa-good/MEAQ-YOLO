@@ -1,7 +1,7 @@
 import math
+
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 def channel_shuffle(x, groups):
@@ -13,25 +13,22 @@ def channel_shuffle(x, groups):
     return x
 
 
-
 class ECA(nn.Module):
     def __init__(self, channel, b=1, gamma=2):
         super().__init__()
         t = int(abs((math.log(channel, 2) + b) / gamma))
         k = t if t % 2 else t + 1
-        k = max(3, k) 
+        k = max(3, k)
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.conv = nn.Conv1d(1, 1, kernel_size=k, padding=(k - 1) // 2, bias=False)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        y = self.avg_pool(x)                                    # [B,C,1,1]
-        y = y.squeeze(-1).transpose(-1, -2)                     # [B,1,C]
-        y = self.conv(y).transpose(-1, -2).unsqueeze(-1)        # [B,C,1,1]
+        y = self.avg_pool(x)  # [B,C,1,1]
+        y = y.squeeze(-1).transpose(-1, -2)  # [B,1,C]
+        y = self.conv(y).transpose(-1, -2).unsqueeze(-1)  # [B,C,1,1]
         y = self.sigmoid(y)
         return x * y
-
-
 
 
 def build_attn(attn, c):
@@ -82,8 +79,14 @@ class EShuffleNetV2(nn.Module):
             )
 
         self.branch2 = nn.Sequential(
-            nn.Conv2d(inp if (self.stride > 1) else branch_features,
-                      branch_features, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.Conv2d(
+                inp if (self.stride > 1) else branch_features,
+                branch_features,
+                kernel_size=1,
+                stride=1,
+                padding=0,
+                bias=False,
+            ),
             nn.BatchNorm2d(branch_features),
             act_layer,
             self.depthwise_conv(branch_features, branch_features, kernel_size=3, stride=self.stride, padding=1),
@@ -93,7 +96,6 @@ class EShuffleNetV2(nn.Module):
             act_layer,
         )
 
-        
         self.attn = build_attn(attn, branch_features)
 
     @staticmethod
