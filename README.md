@@ -47,10 +47,6 @@ Neck
     │
     ▼
 QDD-Head
-    ├── Classification branch
-    ├── Regression branch
-    ├── Quality-guided task alignment
-    └── Detection output
 ```
 
 ## Repository Structure
