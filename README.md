@@ -6,7 +6,7 @@ Official implementation of **MEAQ-YOLO**, a lightweight apple detection model ba
 
 ## 📌 Overview
 
-MEAQ-YOLO is a lightweight apple detection model built on YOLOv11n and designed for deployment in complex orchard environments. It can be used for robotic harvesting, fruit localization, yield estimation, and precision orchard management.
+MEAQ-YOLO is a lightweight apple detection model built on YOLOv11n and designed for deployment in complex orchard environments. It can be used for robotic harvesting, fruit localization, and precision orchard management.
 
 **Key features:**
 
@@ -53,10 +53,6 @@ Neck
     │
     ▼
 QDD-Head
-    ├── Classification Branch
-    ├── Regression Branch
-    ├── Quality-Guided Task Alignment
-    └── Detection Output
 ```
 
 ---
