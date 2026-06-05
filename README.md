@@ -187,7 +187,7 @@ names:
 
 This project is based on the Ultralytics YOLO framework. Please follow the corresponding open-source license requirements of Ultralytics YOLO when using or modifying this repository.
 
-## Acknowledgements
+## Acknowledgments
 
 This work is developed based on the Ultralytics YOLO framework. We thank the open-source community for providing valuable tools and resources for object detection research.
 
