@@ -1,10 +1,8 @@
-import torch
 from ultralytics import YOLO
-import warnings
+
 
 def main():
     model = YOLO("ultralytics/cfg/models/11/MEAQ-YOLO.yaml")
-
 
     model.train(
         data="/data.yaml",
@@ -23,5 +21,7 @@ def main():
     )
 
     model.val()
+
+
 if __name__ == "__main__":
     main()
